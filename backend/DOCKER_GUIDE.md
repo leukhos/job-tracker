@@ -17,7 +17,7 @@ Upload the entire backend directory to your Synology NAS. You can use File Stati
 
 1. Open **Docker** app from Synology DSM
 2. Go to **Registry** tab
-3. Search for `node` and download the official Node.js image (tag: 20-alpine)
+3. Search for `node` and download the official Node.js image (tag: lts-alpine)
 
 ### Step 3: Create Docker Container
 
@@ -99,3 +99,45 @@ REACT_APP_API_URL=http://your-nas-ip:3001/api
 ```
 
 Then rebuild your React app and deploy to Web Station.
+
+## Node.js Version Information
+
+### Understanding Docker Image Tags
+
+This deployment uses the `node:lts-alpine` image tag. Here's what this means:
+
+- **lts**: Always points to the current Long Term Support version of Node.js
+- **alpine**: Uses the lightweight Alpine Linux as the base OS
+
+### Available Tag Options
+
+You can modify the Dockerfile to use different Node.js versions:
+
+1. **lts-alpine** (recommended): Always uses the latest LTS version, currently Node.js 20.x in 2025
+2. **current-alpine**: Always uses the latest current release (may not be LTS)
+3. **20-alpine**: Specifically uses Node.js 20.x
+4. **18-alpine**: Specifically uses Node.js 18.x
+5. **alpine**: Uses the latest release with Alpine Linux
+
+### What Happens With Different Versions?
+
+Using the `lts` tag has both benefits and considerations:
+
+#### Benefits:
+- **Automatic updates**: Your container will use the latest LTS when rebuilt
+- **Security patches**: New LTS versions include security improvements
+- **Future-proof**: You don't need to manually update version numbers
+
+#### Considerations:
+- **Potential compatibility issues**: If you rebuild with a newer LTS version, it might introduce breaking changes
+- **Consistency**: Different builds might use different Node.js versions if a new LTS is released between builds
+- **Testing**: Always test after rebuilding with a new LTS version
+
+If you prefer absolute version stability, use a specific version tag like `20-alpine`.
+
+### Checking Your Node.js Version
+
+To verify which Node.js version is running in your container:
+
+1. Go to `http://your-nas-ip:3001/api/status` - this will show the Node.js version
+2. Or use Docker to run: `docker exec job-tracker-api node -v`

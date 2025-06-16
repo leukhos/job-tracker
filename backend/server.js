@@ -31,7 +31,12 @@ app.get('/api/status', (req, res) => {
     uptime: process.uptime() + ' seconds',
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV || 'development',
-    version: process.env.npm_package_version || require('./package.json').version
+    version: process.env.npm_package_version || require('./package.json').version,
+    node: {
+      version: process.version,
+      platform: process.platform,
+      arch: process.arch
+    }
   });
 });
 
