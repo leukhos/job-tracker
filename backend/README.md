@@ -30,7 +30,7 @@ npm run init-db
 npm start
 ```
 
-The server will start on port 3001 by default.
+The server will start on port 8070 by default.
 
 ## API Endpoints
 
@@ -93,7 +93,7 @@ pm2 startup
 
 You can configure the application by setting these environment variables:
 
-- `PORT` - The port to run the server on (default: 3001)
+- `PORT` - The port to run the server on (default: 8070)
 - `NODE_ENV` - Set to 'production' for production mode
 
 ## License

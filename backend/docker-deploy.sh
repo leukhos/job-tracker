@@ -41,10 +41,10 @@ if ! command -v docker-compose &> /dev/null; then
   echo "Starting container..."
   docker run -d \
     --name job-tracker-api \
-    -p 3001:3001 \
+    -p 8070:8070 \
     -v job-tracker-data:/app/data \
     -e NODE_ENV=production \
-    -e PORT=3001 \
+    -e PORT=8070 \
     --restart unless-stopped \
     job-tracker-api
 else
@@ -59,12 +59,12 @@ IP_ADDRESS=$(hostname -I | awk '{print $1}')
 echo "========================================"
 echo "  Deployment Complete!"
 echo "========================================"
-echo "API is running at: http://$IP_ADDRESS:3001"
-echo "Status endpoint: http://$IP_ADDRESS:3001/api/status"
+echo "API is running at: http://$IP_ADDRESS:8070"
+echo "Status endpoint: http://$IP_ADDRESS:8070/api/status"
 echo ""
 echo "To access the API from your React app,"
 echo "create a .env file in your React project with:"
-echo "REACT_APP_API_URL=http://$IP_ADDRESS:3001/api"
+echo "REACT_APP_API_URL=http://$IP_ADDRESS:8070/api"
 echo ""
 echo "Don't forget to rebuild your React app after"
 echo "updating the .env file."

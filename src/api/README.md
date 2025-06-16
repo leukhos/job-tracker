@@ -73,8 +73,8 @@ const handleSubmit = async (e) => {
 
 ## Configuration
 
-By default, the API client connects to `http://localhost:3001/api`. You can change this by setting the `REACT_APP_API_URL` environment variable in your `.env` file:
+By default, the API client connects to `http://localhost:8070/api`. You can change this by setting the `REACT_APP_API_URL` environment variable in your `.env` file:
 
 ```
-REACT_APP_API_URL=http://your-nas-ip:3001/api
+REACT_APP_API_URL=http://your-nas-ip:8070/api
 ```
