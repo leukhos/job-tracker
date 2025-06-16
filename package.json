@@ -1,13 +1,11 @@
 {
   "name": "job-tracker",
   "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "@testing-library/jest-dom": "^5.16.4",
-    "@testing-library/react": "^13.3.0",
+  "private": true,  "dependencies": {
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "lucide-react": "^0.263.1",
-    "nth-check": "^2.1.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "^5.0.1",
@@ -36,29 +34,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
+  },  "devDependencies": {
+    "tailwindcss": "^3.3.0",
     "autoprefixer": "^10.4.14",
-    "postcss": "^8.5.6",
-    "tailwindcss": "^3.3.0"
-  },  "overrides": {
-    "inflight": "npm:lru-cache@latest",
-    "@babel/plugin-proposal-private-methods": "@babel/plugin-transform-private-methods@latest",
-    "@babel/plugin-proposal-numeric-separator": "@babel/plugin-transform-numeric-separator@latest",
-    "@babel/plugin-proposal-class-properties": "@babel/plugin-transform-class-properties@latest",
-    "@babel/plugin-proposal-nullish-coalescing-operator": "@babel/plugin-transform-nullish-coalescing-operator@latest",
-    "@babel/plugin-proposal-optional-chaining": "@babel/plugin-transform-optional-chaining@latest",
-    "@babel/plugin-proposal-private-property-in-object": "@babel/plugin-transform-private-property-in-object@latest",
-    "@humanwhocodes/config-array": "@eslint/config-array@latest",
-    "@humanwhocodes/object-schema": "@eslint/object-schema@latest",
-    "rimraf": "^4.0.0",
-    "glob": "^9.0.0",
-    "rollup-plugin-terser": "@rollup/plugin-terser@latest",
-    "svgo": "^2.8.0",
-    "stable": "npm:@array-sort/stable@latest",
-    "sourcemap-codec": "@jridgewell/sourcemap-codec@latest",
-    "q": "^2.0.3",
-    "domexception": "^4.0.0",
-    "eslint": "^9.0.0"
+    "postcss": "^8.4.35"
   }
 }

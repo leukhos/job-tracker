@@ -13,16 +13,11 @@
     "express": "^4.18.2",
     "sqlite3": "^5.1.6",
     "morgan": "^1.10.0"
-  },
-  "devDependencies": {
+  },  "devDependencies": {
     "nodemon": "^3.0.1"
-  },  "overrides": {
-    "@npmcli/move-file": "npm:@npmcli/fs@latest",
-    "inflight": "npm:lru-cache@latest",
-    "npmlog": "npm:progress-stream@latest",
-    "rimraf": "^4.0.0",
-    "are-we-there-yet": "npm:progress-tracker@latest",
-    "gauge": "npm:cli-progress@latest",
-    "glob": "^9.0.0"
+  },
+  "overrides": {
+    "glob": "^9.3.5",
+    "rimraf": "^5.0.5"
   }
 }
