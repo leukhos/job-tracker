@@ -22,9 +22,13 @@ Upload the entire backend directory to your Synology NAS. You can use File Stati
 ### Step 3: Create Docker Container
 
 1. In Docker app, go to **Image** tab
-2. Select the Node.js image and click **Launch**
-3. In the wizard, configure the following:
-   - **Container Name**: job-tracker-api
+2. Click on **Build** and provide:
+   - **Repository name**: job-tracker-backend
+   - **Source**: Browse to your backend folder
+   - Click **Build**
+3. After the build completes, select the job-tracker-backend image and click **Launch**
+4. In the wizard, configure the following:
+   - **Container Name**: job-tracker-backend
    - **Advanced Settings**:
      - **Port Settings**: Map local port 8070 to container port 8070
      - **Volume**: Create a new volume or use an existing one, mount it to `/app/data` in container
@@ -57,13 +61,13 @@ This will build and start the container based on the `docker-compose.yml` file.
 
 ### Via API
 
-Access `http://your-nas-ip:3001/api/status` in your browser
+Access `http://your-nas-ip:8070/api/status` in your browser
 
 ### Via Docker GUI
 
 1. Open Docker app in DSM
 2. Go to "Container" tab
-3. Check the status of your job-tracker-api container
+3. Check the status of your job-tracker-backend container
 
 ### Via Command Line
 
@@ -71,7 +75,7 @@ If you have SSH access:
 ```bash
 docker ps
 # or 
-docker logs job-tracker-api
+docker logs job-tracker-backend
 ```
 
 ## Managing Your Container
@@ -95,7 +99,7 @@ To update after code changes:
 
 Update your React app's `.env.production` file with:
 ```
-REACT_APP_API_URL=http://your-nas-ip:3001/api
+REACT_APP_API_URL=http://your-nas-ip:8070/api
 ```
 
 Then rebuild your React app and deploy to Web Station.
@@ -139,8 +143,8 @@ If you prefer absolute version stability, use a specific version tag like `20-al
 
 To verify which Node.js version is running in your container:
 
-1. Go to `http://your-nas-ip:3001/api/status` - this will show the Node.js version
-2. Or use Docker to run: `docker exec job-tracker-api node -v`
+1. Go to `http://your-nas-ip:8070/api/status` - this will show the Node.js version
+2. Or use Docker to run: `docker exec job-tracker-backend node -v`
 
 ## Port Configuration
 

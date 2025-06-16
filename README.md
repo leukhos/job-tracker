@@ -50,7 +50,7 @@ job-tracker/
    ```
 3. Create a `.env` file in the root directory with:
    ```
-   REACT_APP_API_URL=http://localhost:3001/api
+   REACT_APP_API_URL=http://localhost:8070/api
    ```
 4. Start the development server:
    ```
@@ -76,7 +76,7 @@ job-tracker/
    ```
    npm start
    ```
-   The backend server will run on http://localhost:3001 by default.
+   The backend server will run on http://localhost:8070 by default.
 
 ## Deployment on Synology NAS
 
@@ -118,7 +118,7 @@ The script will:
 1. Update the `.env` file with your NAS IP address:
 
 ```
-REACT_APP_API_URL=http://your-nas-ip:3001/api
+REACT_APP_API_URL=http://your-nas-ip:8070/api
 ```
 
 2. Build the production version of the frontend:

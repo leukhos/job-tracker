@@ -1,11 +1,11 @@
 version: '3'
 
 services:
-  job-tracker-api:
+  job-tracker-backend:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: job-tracker-api
+    container_name: job-tracker-backend
     ports:
       - "8070:8070"
     volumes:

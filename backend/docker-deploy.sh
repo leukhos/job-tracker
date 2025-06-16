@@ -22,7 +22,7 @@ if ! command -v docker-compose &> /dev/null; then
   
   # Build the Docker image
   echo "Building Docker image..."
-  docker build -t job-tracker-api .
+  docker build -t job-tracker-backend .
   
   # Create data volume if it doesn't exist
   if ! docker volume ls | grep -q job-tracker-data; then
@@ -31,22 +31,22 @@ if ! command -v docker-compose &> /dev/null; then
   fi
   
   # Stop and remove existing container if it exists
-  if docker ps -a | grep -q job-tracker-api; then
+  if docker ps -a | grep -q job-tracker-backend; then
     echo "Stopping and removing existing container..."
-    docker stop job-tracker-api || true
-    docker rm job-tracker-api || true
+    docker stop job-tracker-backend || true
+    docker rm job-tracker-backend || true
   fi
   
   # Run the container
   echo "Starting container..."
   docker run -d \
-    --name job-tracker-api \
+    --name job-tracker-backend \
     -p 8070:8070 \
     -v job-tracker-data:/app/data \
     -e NODE_ENV=production \
     -e PORT=8070 \
     --restart unless-stopped \
-    job-tracker-api
+    job-tracker-backend
 else
   # Using Docker Compose
   echo "Using Docker Compose..."

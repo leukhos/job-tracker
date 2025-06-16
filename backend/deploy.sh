@@ -6,7 +6,7 @@ set -e
 
 # Configuration
 APP_NAME="job-tracker"
-APP_PORT=3001
+APP_PORT=8070
 PM2_ENABLED=true
 
 echo "========================================"
@@ -76,7 +76,7 @@ if [ "$PM2_ENABLED" = true ]; then
   
   # Start the application with PM2
   echo "Starting the application with PM2..."
-  pm2 start server.js --name "$APP_NAME-api"
+  pm2 start server.js --name "$APP_NAME-backend"
   pm2 save
   
   # Setup PM2 to start on boot

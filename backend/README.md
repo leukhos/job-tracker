@@ -82,12 +82,12 @@ cd /volume1/your/path/to/job-tracker/backend && npm start
 
 ```bash
 npm install -g pm2
-pm2 start server.js --name "job-tracker-api"
+pm2 start server.js --name "job-tracker-backend"
 pm2 save
 pm2 startup
 ```
 
-7. Configure your frontend to connect to the NAS IP and port 3001
+7. Configure your frontend to connect to the NAS IP and port 8070
 
 ## Configuration
 
