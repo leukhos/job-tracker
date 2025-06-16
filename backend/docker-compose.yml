@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  job-tracker-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: job-tracker-api
+    ports:
+      - "3001:3001"
+    volumes:
+      - job-tracker-data:/app/data
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+
+volumes:
+  job-tracker-data:

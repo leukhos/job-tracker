@@ -1,6 +1,6 @@
 # Job Tracker
 
-A React application for tracking and managing job applications during your job search process.
+A React application for tracking and managing job applications during your job search process. Now with data persistence through a Node.js/Express backend and SQLite database!
 
 ## Features
 
@@ -9,39 +9,139 @@ A React application for tracking and managing job applications during your job s
 - Record job details including salary range, location, and remote work options
 - Add personal notes for each application
 - Filter and search through your job applications
+- Persistent storage with SQLite database
+- Offline support with automatic synchronization
+- Mobile-friendly responsive design
 
 ## Tech Stack
 
 - React.js
 - Tailwind CSS
 - Lucide React (for icons)
+- Node.js/Express (backend)
+- SQLite (database)
+
+## Project Structure
+
+```
+job-tracker/
+├── backend/             # Backend API server
+│   ├── server.js        # Express server
+│   ├── database.js      # SQLite database integration
+│   ├── initDb.js        # Database initialization script
+│   └── package.json     # Backend dependencies
+│
+└── src/                 # Frontend React application
+    ├── api/             # API integration
+    │   ├── api.js       # API client
+    │   └── useJobs.js   # React hook for job data
+    ├── JobTracker.js    # Main application component
+    └── index.js         # Application entry point
+```
 
 ## Getting Started
 
-### Prerequisites
-
-- Node.js (v14 or higher recommended)
-- npm or yarn
-
-### Installation
+### Frontend Setup
 
 1. Clone this repository
 2. Install dependencies:
    ```
    npm install
    ```
-3. Start the development server:
+3. Create a `.env` file in the root directory with:
+   ```
+   REACT_APP_API_URL=http://localhost:3001/api
+   ```
+4. Start the development server:
    ```
    npm start
    ```
-4. Open your browser and navigate to `http://localhost:3000`
+5. Open your browser and navigate to `http://localhost:3000`
+
+### Backend Setup
+
+1. Navigate to the backend directory:
+   ```
+   cd backend
+   ```
+2. Install the dependencies:
+   ```
+   npm install
+   ```
+3. Initialize the database:
+   ```
+   npm run init-db
+   ```
+4. Start the backend server:
+   ```
+   npm start
+   ```
+   The backend server will run on http://localhost:3001 by default.
+
+## Deployment on Synology NAS
+
+### Backend Deployment
+
+#### Option 1: Docker Deployment (Recommended)
+
+The easiest way to deploy on Synology NAS is using Docker:
+
+1. Install Docker from Synology Package Center
+2. Upload the backend directory to your NAS
+3. Use the Docker GUI to create and run the container
+
+For detailed instructions, see [backend/DOCKER_GUIDE.md](backend/DOCKER_GUIDE.md).
+
+#### Option 2: Traditional Deployment
+
+If you prefer a traditional setup:
+
+1. Upload the project files to your Synology NAS
+2. Install Node.js from the Synology Package Center
+3. SSH into your NAS and navigate to the project directory
+4. Run the deployment script:
+
+```bash
+cd backend
+chmod +x deploy.sh
+./deploy.sh
+```
+
+The script will:
+- Install backend dependencies
+- Initialize the database
+- Set up PM2 for process management (optional)
+- Start the backend server
+
+### Frontend Deployment
+
+1. Update the `.env` file with your NAS IP address:
+
+```
+REACT_APP_API_URL=http://your-nas-ip:3001/api
+```
+
+2. Build the production version of the frontend:
+
+```bash
+npm run build
+```
+
+3. Upload the contents of the `build` directory to your web server or Synology Web Station
 
 ## Available Scripts
 
-- `npm start` - Starts the development server
-- `npm build` - Builds the app for production
-- `npm test` - Runs tests
-- `npm eject` - Ejects from create-react-app
+### Frontend
+
+- `npm start` - Starts the frontend development server
+- `npm build` - Builds the frontend app for production
+- `npm test` - Runs frontend tests
+
+### Backend
+
+- `npm start` - Starts the backend server
+- `npm run dev` - Starts the backend server with nodemon for development
+- `npm run init-db` - Initializes the SQLite database with schema and sample data
 
 ## License
 
@@ -49,4 +149,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## About
 
-Job Tracker helps you stay organized during your job search by providing a centralized location to track all your job applications, interviews, and follow-ups.
+Job Tracker helps you stay organized during your job search by providing a centralized location to track all your job applications, interviews, and follow-ups. With the addition of a backend API and database, your data is now securely stored and accessible from anywhere, while still supporting offline usage.
+
+## API Endpoints
+
+- `GET /api/jobs` - Get all job applications
+- `GET /api/jobs/:id` - Get a job application by ID
+- `POST /api/jobs` - Create a new job application
+- `PUT /api/jobs/:id` - Update an existing job application
+- `DELETE /api/jobs/:id` - Delete a job application

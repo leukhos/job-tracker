@@ -1,0 +1,31 @@
+# Node modules
+node_modules
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Database files (will be stored in a volume)
+data/*.db
+
+# OS files
+.DS_Store
+
+# Environment variables
+.env
+
+# Git files
+.git
+.gitignore
+
+# Documentation
+README.md
+
+# Test files
+test
+coverage
+
+# Editor directories and files
+.idea
+.vscode
