@@ -1,4 +1,4 @@
-const { db } = require('./database');
+const database = require('./database');
 const path = require('path');
 const fs = require('fs');
 
@@ -14,16 +14,16 @@ const initializeDatabase = () => {
   console.log('Initializing database...');
   
   // Create the jobs table
-  db.serialize(() => {
+  database.db.serialize(() => {
     // Drop the table if it exists (for clean initialization)
-    db.run('DROP TABLE IF EXISTS jobs', (err) => {
+    database.db.run('DROP TABLE IF EXISTS jobs', (err) => {
       if (err) {
         console.error('Error dropping jobs table:', err.message);
         return;
       }
       
       // Create the jobs table
-      db.run(`
+      database.db.run(`
         CREATE TABLE jobs (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           jobTitle TEXT NOT NULL,
@@ -83,7 +83,7 @@ const initializeDatabase = () => {
         ];
         
         // Insert sample jobs
-        const stmt = db.prepare(`
+        const stmt = database.db.prepare(`
           INSERT INTO jobs (
             jobTitle, company, location, remoteType, 
             salaryMin, salaryMax, status, jobUrl, 
@@ -121,7 +121,7 @@ initializeDatabase();
 
 // Close the database connection when done
 setTimeout(() => {
-  db.close((err) => {
+  database.db.close((err) => {
     if (err) {
       console.error('Error closing database:', err.message);
     } else {
