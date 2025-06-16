@@ -85,7 +85,23 @@ app.post('/api/jobs', async (req, res) => {
 // Update job
 app.put('/api/jobs/:id', async (req, res) => {
   try {
-    // Validate required fields
+    // If it's only a status update, we should get the existing job data
+    if (req.body.status && Object.keys(req.body).length <= 3 && !req.body.jobTitle && !req.body.company) {
+      // This might be just a status update
+      const existingJob = await getJobById(req.params.id);
+      if (!existingJob) {
+        return res.status(404).json({ error: 'Job not found' });
+      }
+      
+      // Only updating specific fields, so merge with existing data
+      const updatedJob = await updateJob(req.params.id, {
+        ...existingJob,
+        ...req.body
+      });
+      return res.json(updatedJob);
+    }
+    
+    // For full updates, validate required fields
     if (!req.body.jobTitle || !req.body.company) {
       return res.status(400).json({ error: 'Job title and company are required' });
     }

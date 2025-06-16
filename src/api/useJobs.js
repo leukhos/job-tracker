@@ -231,10 +231,19 @@ const useJobs = () => {
       return false;
     }
   };
-
   // Update job status (convenience method)
   const updateJobStatus = async (id, newStatus) => {
+    // Find the current job data to preserve required fields
+    const currentJob = jobs.find(job => job.id === id);
+    if (!currentJob) {
+      setError(`Job with ID ${id} not found`);
+      return null;
+    }
+    
     return updateJob(id, { 
+      // Include required fields to satisfy server validation
+      jobTitle: currentJob.jobTitle,
+      company: currentJob.company,
       status: newStatus,
       lastUpdated: new Date().toISOString().split('T')[0]
     });
