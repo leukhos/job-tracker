@@ -1,24 +1,30 @@
 name: Backend Tests
 
 on:
-  pull_request:
-    branches: [ main ]
-    paths:
-      - 'backend/**'
-      - '.github/workflows/backend-tests.yml'
+  workflow_call:
+    inputs:
+      node-version:
+        description: 'Node.js version to use'
+        required: false
+        type: string
+        default: 'lts/*'
+    secrets:
+      CODECOV_TOKEN:
+        required: false
 
 jobs:
   test:
+    name: Backend Tests
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Setup Node.js LTS
+    - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: 'lts/*'
+        node-version: ${{ inputs.node-version }}
         cache: 'npm'
         cache-dependency-path: backend/package-lock.json
 
@@ -43,6 +49,7 @@ jobs:
         npm run test:coverage
 
     - name: Upload coverage reports
+      if: ${{ secrets.CODECOV_TOKEN != '' }}
       uses: codecov/codecov-action@v4
       with:
         directory: backend/coverage
