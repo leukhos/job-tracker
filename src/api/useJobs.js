@@ -62,7 +62,6 @@ const useJobs = () => {
     // Refresh the job list after processing changes
     fetchJobs();
   }, [isOnline, pendingChanges]);
-
   // Initial data fetch
   const fetchJobs = useCallback(async () => {
     if (!isOnline) {
@@ -74,16 +73,20 @@ const useJobs = () => {
     setError(null);
     
     try {
+      console.log('Fetching jobs from API...');
       const data = await api.getAllJobs();
-      
-      if (data.error) {
+        if (data.error) {
+        console.error('Error returned from API:', data.error);
         setError(data.error);
       } else {
-        setJobs(data);
+        console.log('Successfully fetched jobs:', data);
+        // Check if the response has a data property (which indicates the paginated response format)
+        const jobsArray = data.data || data;
+        setJobs(Array.isArray(jobsArray) ? jobsArray : []);
       }
     } catch (err) {
-      setError('Failed to fetch jobs. Please try again later.');
       console.error('Error fetching jobs:', err);
+      setError('Failed to fetch jobs. Please try again later.');
     } finally {
       setIsLoading(false);
     }
