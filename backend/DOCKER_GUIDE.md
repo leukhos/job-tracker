@@ -99,7 +99,7 @@ To update after code changes:
 
 Update your React app's `.env.production` file with:
 ```
-REACT_APP_API_URL=http://your-nas-ip:8070/api
+VITE_API_URL=http://your-nas-ip:8070/api
 ```
 
 Then rebuild your React app and deploy to Web Station.
@@ -176,5 +176,5 @@ ports:
 PORT=9090
 
 # In .env file
-REACT_APP_API_URL=http://your-nas-ip:9090/api
+VITE_API_URL=http://your-nas-ip:9090/api
 ```

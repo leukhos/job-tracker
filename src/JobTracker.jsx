@@ -15,7 +15,6 @@ import {
   ChevronDown,
   Wifi,
   WifiOff,
-  RefreshCw,
   AlertCircle
 } from 'lucide-react';
 import useJobs from './api/useJobs';

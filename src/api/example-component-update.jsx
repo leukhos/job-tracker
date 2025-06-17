@@ -1,6 +1,6 @@
 import React from 'react';
 import useJobs from '../api/useJobs';
-import { AlertCircle, Wifi, WifiOff, RefreshCw } from 'lucide-react';
+import { AlertCircle, Wifi, WifiOff } from 'lucide-react';
 
 // This is an example of how to update your existing JobTracker component
 // You can use this as a reference to modify your actual component
