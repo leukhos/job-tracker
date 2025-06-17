@@ -9,11 +9,12 @@
     "init-db": "node initDb.js"
   },
   "dependencies": {
+    "better-sqlite3": "^9.4.1",
     "cors": "^2.8.5",
     "express": "^4.18.2",
-    "sqlite3": "^5.1.6",
     "morgan": "^1.10.0"
-  },  "devDependencies": {
+  },
+  "devDependencies": {
     "nodemon": "^3.0.1"
   },
   "overrides": {
