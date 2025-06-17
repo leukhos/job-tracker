@@ -1,5 +1,7 @@
 # Job Tracker
 
+> **⚠️ Disclaimer**: This project has been entirely developed using GitHub Copilot (Claude AI) as a coding assistant. The code and documentation have not been reviewed by a developer with experience in Node.js or React. This is a personal use project and there is significant room for improvement in terms of code quality, security practices, and overall architecture. Use at your own discretion and consider having the code reviewed by experienced developers before using in any production environment.
+
 A React application for tracking and managing job applications during your job search process. Now with data persistence through a Node.js/Express backend and SQLite database!
 
 ## Features
