@@ -8,8 +8,6 @@ jobs:
   backend-tests:
     name: Run Backend Tests
     uses: ./.github/workflows/backend-tests.yml
-    secrets:
-      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   frontend-build:
     name: Build Frontend

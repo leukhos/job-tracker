@@ -8,9 +8,6 @@ on:
         required: false
         type: string
         default: "lts/*"
-    secrets:
-      CODECOV_TOKEN:
-        required: false
 
 jobs:
   test:
@@ -47,14 +44,3 @@ jobs:
         run: |
           cd backend
           npm run test:coverage
-
-      - name: Upload coverage reports
-        if: secrets.CODECOV_TOKEN
-        uses: codecov/codecov-action@v4
-        with:
-          directory: backend/coverage
-          flags: backend
-          name: backend-coverage
-          fail_ci_if_error: false
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
