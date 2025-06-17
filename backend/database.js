@@ -57,6 +57,7 @@ const SQL = {
   SET_DB_VERSION: 'INSERT OR REPLACE INTO db_version (id, version, updated_at) VALUES (1, ?, ?)',
 
   GET_ALL_JOBS: 'SELECT * FROM jobs ORDER BY company COLLATE NOCASE ASC LIMIT ? OFFSET ?',
+  COUNT_ALL_JOBS: 'SELECT COUNT(*) as total FROM jobs',
   GET_JOB_BY_ID: 'SELECT * FROM jobs WHERE id = ?',
   CREATE_JOB: `
     INSERT INTO jobs (
@@ -87,6 +88,11 @@ const SQL = {
     AND (status = ? OR ? IS NULL)
     ORDER BY company COLLATE NOCASE ASC
     LIMIT ? OFFSET ?
+  `,
+  COUNT_SEARCH_JOBS: `
+    SELECT COUNT(*) as total FROM jobs 
+    WHERE (jobTitle LIKE ? OR company LIKE ? OR notes LIKE ?)
+    AND (status = ? OR ? IS NULL)
   `
 };
 
@@ -139,6 +145,17 @@ const getAllJobs = (limit = 100, offset = 0) => {
     return stmt.all(limit, offset);
   } catch (error) {
     console.error('Error getting all jobs:', error);
+    throw error;
+  }
+};
+
+// Get total count of all jobs
+const countAllJobs = () => {
+  try {
+    const stmt = db.prepare(SQL.COUNT_ALL_JOBS);
+    return stmt.get().total;
+  } catch (error) {
+    console.error('Error counting all jobs:', error);
     throw error;
   }
 };
@@ -290,6 +307,27 @@ const searchJobs = (criteria = {}, limit = 100, offset = 0) => {
   }
 };
 
+// Count search results
+const countSearchResults = (criteria = {}) => {
+  try {
+    const { searchTerm, status } = criteria;
+    const searchPattern = searchTerm ? `%${searchTerm}%` : '%';
+    
+    const stmt = db.prepare(SQL.COUNT_SEARCH_JOBS);
+    const result = stmt.get(
+      searchPattern,
+      searchPattern,
+      searchPattern,
+      status || null,
+      status || null
+    );
+    return result ? result.total : 0;
+  } catch (error) {
+    console.error('Error counting search results:', error);
+    throw error;
+  }
+};
+
 // Close database connection
 const closeDatabase = () => {
   try {
@@ -316,5 +354,7 @@ module.exports = {
   deleteJob,
   db,
   searchJobs,
-  closeDatabase
+  closeDatabase,
+  countAllJobs,
+  countSearchResults
 };

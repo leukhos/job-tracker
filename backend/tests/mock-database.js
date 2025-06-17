@@ -116,6 +116,26 @@ const seedTestData = () => {
   }
 };
 
+// Additional functions for pagination tests
+const countAllJobs = async () => {
+  const result = db.prepare('SELECT COUNT(*) as total FROM jobs').get();
+  return result.total;
+};
+
+const countSearchResults = async (criteria) => {
+  const { searchTerm, status } = criteria;
+  const searchPattern = searchTerm ? `%${searchTerm}%` : '%';
+  
+  const stmt = db.prepare(`
+    SELECT COUNT(*) as total FROM jobs 
+    WHERE (jobTitle LIKE ? OR company LIKE ? OR notes LIKE ?)
+    AND (status = ? OR ? IS NULL)
+  `);
+  
+  const result = stmt.get(searchPattern, searchPattern, searchPattern, status, status);
+  return result.total;
+};
+
 // Export mock database functions that mirror the real ones
 module.exports = {
   db,
@@ -229,7 +249,30 @@ module.exports = {
     });
   },
   
+  // Add pagination functions
+  countAllJobs: async () => {
+    const result = db.prepare('SELECT COUNT(*) as total FROM jobs').get();
+    return result.total;
+  },
+  
+  countSearchResults: async (criteria) => {
+    const { searchTerm, status } = criteria;
+    const searchPattern = searchTerm ? `%${searchTerm}%` : '%';
+    
+    const stmt = db.prepare(`
+      SELECT COUNT(*) as total FROM jobs 
+      WHERE (jobTitle LIKE ? OR company LIKE ? OR notes LIKE ?)
+      AND (status = ? OR ? IS NULL)
+    `);
+    
+    const result = stmt.get(searchPattern, searchPattern, searchPattern, status, status);
+    return result.total;
+  },
+  
   closeDatabase: () => {
-    // In-memory database is automatically closed when the process ends
+    // Close the in-memory database
+    if (db) {
+      db.close();
+    }
   }
 };

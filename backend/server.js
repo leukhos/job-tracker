@@ -1,7 +1,11 @@
+// Load environment variables from .env file
+require('dotenv').config();
+
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const path = require('path');
+const rateLimit = require('express-rate-limit');
 const { 
   getAllJobs, 
   getJobById, 
@@ -9,12 +13,30 @@ const {
   updateJob, 
   deleteJob,
   searchJobs,
-  closeDatabase
+  closeDatabase,
+  countAllJobs,
+  countSearchResults
 } = require('./database');
 
 // Initialize Express app
 const app = express();
 const PORT = process.env.PORT || 8070;
+
+// Rate limiting middleware
+const limiter = rateLimit({
+  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, // 15 minutes by default
+  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100, // Limit each IP to 100 requests per window
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  message: {
+    error: 'Too many requests, please try again later.',
+    statusCode: 429,
+    timestamp: new Date().toISOString()
+  }
+});
+
+// Apply rate limiting to all API routes
+app.use('/api', limiter);
 
 // Middleware
 app.use(cors());
@@ -98,12 +120,24 @@ app.get('/api/jobs', async (req, res) => {
     const offset = parseInt(req.query.offset) || 0;
     
     const jobs = await getAllJobs(limit, offset);
+    
+    // Get total count if the function exists, otherwise use jobs.length
+    let totalCount = jobs.length;
+    try {
+      if (typeof countAllJobs === 'function') {
+        totalCount = await countAllJobs();
+      }
+    } catch (countError) {
+      console.warn('Count function not available, using page length');
+    }
+    
     res.json({
       data: jobs,
       pagination: {
         limit,
         offset,
-        total: jobs.length // Note: For accurate count we'd need a separate count query
+        total: totalCount,
+        currentPageCount: jobs.length
       }
     });
   } catch (error) {
@@ -120,40 +154,26 @@ app.get('/api/jobs/search', async (req, res) => {
     const searchTerm = req.query.q || '';
     const status = req.query.status || null;
     
-    const jobs = await searchJobs({ searchTerm, status }, limit, offset);
-    res.json({
-      data: jobs,
-      pagination: {
-        limit,
-        offset,
-        total: jobs.length
-      },
-      filters: {
-        searchTerm,
-        status
-      }
-    });
-  } catch (error) {
-    console.error('Error searching jobs:', error);
-    res.status(500).json({ error: 'Failed to search jobs', details: error.message });
-  }
-});
-
-// Search jobs - Must be before the ID route to avoid conflict
-app.get('/api/jobs/search', async (req, res) => {
-  try {
-    const limit = parseInt(req.query.limit) || 100;
-    const offset = parseInt(req.query.offset) || 0;
-    const searchTerm = req.query.q || '';
-    const status = req.query.status || null;
+    const criteria = { searchTerm, status };
+    const jobs = await searchJobs(criteria, limit, offset);
     
-    const jobs = await searchJobs({ searchTerm, status }, limit, offset);
+    // Get total count if the function exists, otherwise use jobs.length
+    let totalCount = jobs.length;
+    try {
+      if (typeof countSearchResults === 'function') {
+        totalCount = await countSearchResults(criteria);
+      }
+    } catch (countError) {
+      console.warn('Count function not available, using page length');
+    }
+    
     res.json({
       data: jobs,
       pagination: {
         limit,
         offset,
-        total: jobs.length
+        total: totalCount,
+        currentPageCount: jobs.length
       },
       filters: {
         searchTerm,
@@ -260,10 +280,17 @@ if (process.env.NODE_ENV === 'production') {
 // Error handling middleware
 app.use(errorHandler);
 
-// Start the server
-let server;
-if (process.env.NODE_ENV !== 'test') {
-  server = app.listen(PORT, () => {
+// Export for testing
+module.exports = {
+  app,
+  errorHandler,
+  validateJobInput
+};
+
+// If this file is being run directly (not imported), start the server
+if (require.main === module) {
+  // Start the server
+  app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });
 }
@@ -288,4 +315,4 @@ process.on('SIGINT', gracefulShutdown);
 process.on('SIGTERM', gracefulShutdown);
 
 // Export app for testing
-module.exports = { app, errorHandler, validateJobInput, server };
+module.exports = { app, errorHandler, validateJobInput };

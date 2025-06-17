@@ -25,7 +25,9 @@ describe('API Endpoints', () => {
 
   afterAll(async () => {
     // Close the server to prevent open handles
-    server.close();
+    if (server) {
+      server.close();
+    }
     
     // Close the database connection
     await mockDb.closeDatabase();
