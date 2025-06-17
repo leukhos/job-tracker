@@ -1,6 +1,8 @@
 // Base API URL - change this to your actual backend URL when deployed
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8070/api';
 
+console.log('API_BASE_URL:', API_BASE_URL);
+
 // For handling network errors
 const handleNetworkError = (error) => {
   console.error('Network error:', error);
@@ -16,10 +18,13 @@ const handleApiResponse = async (response) => {
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
     const errorMessage = errorData.error || `Error: ${response.status} ${response.statusText}`;
+    console.error('API error:', errorMessage);
     throw new Error(errorMessage);
   }
   
-  return response.json();
+  const data = await response.json();
+  console.log('API response:', data);
+  return data;
 };
 
 // API request with retry functionality
