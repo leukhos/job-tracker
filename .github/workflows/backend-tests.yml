@@ -1,0 +1,46 @@
+name: Backend Tests
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: "Node.js version to use"
+        required: false
+        type: string
+        default: "lts/*"
+
+jobs:
+  test:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: "npm"
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install backend dependencies
+        run: |
+          cd backend
+          npm ci
+
+      - name: Initialize test database
+        run: |
+          cd backend
+          npm run init-db
+
+      - name: Run backend tests
+        run: |
+          cd backend
+          npm test
+
+      - name: Run backend tests with coverage
+        run: |
+          cd backend
+          npm run test:coverage

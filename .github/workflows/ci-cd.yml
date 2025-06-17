@@ -1,0 +1,14 @@
+name: CI/CD Pipeline
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  backend-tests:
+    name: Run Backend Tests
+    uses: ./.github/workflows/backend-tests.yml
+
+  frontend-build:
+    name: Build Frontend
+    uses: ./.github/workflows/frontend-build.yml
