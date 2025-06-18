@@ -45,6 +45,11 @@ if ! command -v docker-compose &> /dev/null; then
     -v job-tracker-data:/app/data \
     -e NODE_ENV=production \
     -e PORT=8070 \
+    -e DB_DIR=data \
+    -e DB_PATH=data/job_tracker.db \
+    -e RATE_LIMIT_WINDOW_MS=60000 \
+    -e RATE_LIMIT_MAX_REQUESTS=50 \
+    -e DEBUG_DB=false \
     --restart unless-stopped \
     job-tracker-backend
 else
