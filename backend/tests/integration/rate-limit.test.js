@@ -6,18 +6,27 @@ jest.mock('../../database', () => mockDb);
 
 // Import the app after mocking
 let app;
+let server;
 
 describe('Rate Limiting', () => {
-  beforeAll(() => {
+  beforeAll(async () => {
     // Initialize the test database
     mockDb.initTestDb();
     
     // Import the app after mocking the database
     const serverModule = require('../../server');
     app = serverModule.app; 
+    
+    // Create server instance for proper cleanup
+    server = app.listen(0); // Use any available port
   });
 
   afterAll(async () => {
+    // Close the server to prevent open handles
+    if (server) {
+      server.close();
+    }
+    
     // Close the database connection
     await mockDb.closeDatabase();
   });

@@ -1,4 +1,4 @@
-const Database = require('better-sqlite3');
+const { DatabaseSync } = require('node:sqlite');
 const path = require('path');
 const fs = require('fs');
 
@@ -21,11 +21,24 @@ const dbPath = process.env.DB_PATH
 const logger = DEBUG ? console.log : () => {};
 
 // Create database connection
-const db = new Database(dbPath, { 
-  verbose: logger 
-});
+let db;
+let isInitialized = false;
 
-console.log(`Connected to the SQLite database at ${dbPath} (${ENV} environment).`);
+const initializeDatabase = () => {
+  if (isInitialized) {
+    return db;
+  }
+  
+  db = new DatabaseSync(dbPath);
+  console.log(`Connected to the SQLite database at ${dbPath} (${ENV} environment).`);
+  isInitialized = true;
+  return db;
+};
+
+// Initialize database for non-test environments or if not already initialized
+if (ENV !== 'test' || !isInitialized) {
+  initializeDatabase();
+}
 
 // SQL Query Constants
 const SQL = {
@@ -98,6 +111,10 @@ const SQL = {
 
 // Initialize database tables
 const initDb = () => {
+  if (!db) {
+    initializeDatabase();
+  }
+  
   try {
     // Create version table if it doesn't exist
     db.exec(SQL.CREATE_VERSION_TABLE);
@@ -105,16 +122,19 @@ const initDb = () => {
     // Check current version
     let currentVersion = 1;
     try {
-      const versionRow = db.prepare(SQL.GET_DB_VERSION).get();
+      const versionStmt = db.prepare(SQL.GET_DB_VERSION);
+      const versionRow = versionStmt.get();
       if (versionRow) {
         currentVersion = versionRow.version;
       } else {
         // Set initial version
-        db.prepare(SQL.SET_DB_VERSION).run(currentVersion, new Date().toISOString());
+        const setVersionStmt = db.prepare(SQL.SET_DB_VERSION);
+        setVersionStmt.run(currentVersion, new Date().toISOString());
       }
     } catch (err) {
       console.log('Setting up version tracking for the first time');
-      db.prepare(SQL.SET_DB_VERSION).run(currentVersion, new Date().toISOString());
+      const setVersionStmt = db.prepare(SQL.SET_DB_VERSION);
+      setVersionStmt.run(currentVersion, new Date().toISOString());
     }
     
     // Create jobs table if it doesn't exist
@@ -135,11 +155,14 @@ const initDb = () => {
   }
 };
 
-// Initialize database on module import
-initDb();
+// Initialize database on module import for non-test environments
+if (ENV !== 'test') {
+  initDb();
+}
 
 // Get all jobs with pagination
 const getAllJobs = (limit = 100, offset = 0) => {
+  if (!db) initDb();
   try {
     const stmt = db.prepare(SQL.GET_ALL_JOBS);
     return stmt.all(limit, offset);
@@ -151,6 +174,7 @@ const getAllJobs = (limit = 100, offset = 0) => {
 
 // Get total count of all jobs
 const countAllJobs = () => {
+  if (!db) initDb();
   try {
     const stmt = db.prepare(SQL.COUNT_ALL_JOBS);
     return stmt.get().total;
@@ -162,6 +186,7 @@ const countAllJobs = () => {
 
 // Get job by ID
 const getJobById = (id) => {
+  if (!db) initDb();
   try {
     const stmt = db.prepare(SQL.GET_JOB_BY_ID);
     return stmt.get(id);
@@ -173,6 +198,7 @@ const getJobById = (id) => {
 
 // Create a new job
 const createJob = (jobData) => {
+  if (!db) initDb();
   try {
     // Validate required fields
     if (!jobData.jobTitle || !jobData.company) {
@@ -220,6 +246,7 @@ const createJob = (jobData) => {
 
 // Update an existing job
 const updateJob = (id, jobData) => {
+  if (!db) initDb();
   try {
     const now = new Date().toISOString();
     
@@ -268,6 +295,7 @@ const updateJob = (id, jobData) => {
 
 // Delete a job
 const deleteJob = (id) => {
+  if (!db) initDb();
   try {
     // Check if job exists
     const job = getJobById(id);
@@ -287,6 +315,7 @@ const deleteJob = (id) => {
 
 // Search for jobs with various criteria
 const searchJobs = (criteria = {}, limit = 100, offset = 0) => {
+  if (!db) initDb();
   try {
     const { searchTerm, status } = criteria;
     const searchPattern = searchTerm ? `%${searchTerm}%` : '%';
@@ -309,6 +338,7 @@ const searchJobs = (criteria = {}, limit = 100, offset = 0) => {
 
 // Count search results
 const countSearchResults = (criteria = {}) => {
+  if (!db) initDb();
   try {
     const { searchTerm, status } = criteria;
     const searchPattern = searchTerm ? `%${searchTerm}%` : '%';
@@ -330,6 +360,7 @@ const countSearchResults = (criteria = {}) => {
 
 // Close database connection
 const closeDatabase = () => {
+  if (!db) return true;
   try {
     db.close();
     console.log('Database connection closed.');
@@ -356,5 +387,7 @@ module.exports = {
   searchJobs,
   closeDatabase,
   countAllJobs,
-  countSearchResults
+  countSearchResults,
+  initDb,
+  initializeDatabase
 };

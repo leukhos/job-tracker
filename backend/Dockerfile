@@ -1,8 +1,5 @@
 FROM node:lts-alpine
 
-# Install build dependencies for better-sqlite3
-RUN apk add --no-cache python3 make g++
-
 # Create app directory
 WORKDIR /app
 

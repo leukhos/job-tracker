@@ -23,6 +23,16 @@ try {
 }
 
 describe('Error Handler Middleware', () => {
+  beforeEach(() => {
+    // Mock console.error to reduce test noise
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    // Restore console.error after each test
+    console.error.mockRestore();
+  });
+
   it('should handle errors with provided status code', () => {
     const error = new Error('Test error');
     error.statusCode = 400;

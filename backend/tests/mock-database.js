@@ -1,9 +1,9 @@
 // Mock database module for testing
 const path = require('path');
-const Database = require('better-sqlite3');
+const { DatabaseSync } = require('node:sqlite');
 
 // Create in-memory database for testing
-const db = new Database(':memory:');
+const db = new DatabaseSync(':memory:');
 
 // Initialize the database with tables
 const initTestDb = () => {

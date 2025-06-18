@@ -288,9 +288,10 @@ module.exports = {
 };
 
 // If this file is being run directly (not imported), start the server
+let server;
 if (require.main === module) {
   // Start the server
-  app.listen(PORT, () => {
+  server = app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });
 }
