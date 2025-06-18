@@ -20,7 +20,7 @@ const {
 
 // Initialize Express app
 const app = express();
-const PORT = process.env.PORT || 8070;
+const PORT = process.env.PORT || 3000;
 
 // Rate limiting middleware
 const limiter = rateLimit({

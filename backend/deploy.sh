@@ -6,7 +6,7 @@ set -e
 
 # Configuration
 APP_NAME="job-tracker"
-APP_PORT=8070
+APP_PORT=3000
 PM2_ENABLED=true
 
 echo "========================================"

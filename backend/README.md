@@ -30,7 +30,7 @@ npm run init-db
 npm start
 ```
 
-The server will start on port 8070 by default.
+The server will start on port 3000 by default.
 
 ## API Endpoints
 
@@ -87,13 +87,13 @@ pm2 save
 pm2 startup
 ```
 
-7. Configure your frontend to connect to the NAS IP and port 8070
+7. Configure your frontend to connect to the NAS IP and port 3000
 
 ## Configuration
 
 You can configure the application by setting these environment variables:
 
-- `PORT` - The port to run the server on (default: 8070)
+- `PORT` - The port to run the server on (default: 3000)
 - `NODE_ENV` - Set to 'production' for production mode
 
 ## License

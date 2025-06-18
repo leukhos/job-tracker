@@ -52,7 +52,7 @@ job-tracker/
    ```
 3. Create a `.env` file in the root directory with:
    ```
-   VITE_API_URL=http://localhost:8070/api
+   VITE_API_URL=http://localhost:3000/api
    ```
 4. Start the development server:
    ```
@@ -78,7 +78,7 @@ job-tracker/
    ```
    npm start
    ```
-   The backend server will run on http://localhost:8070 by default.
+   The backend server will run on http://localhost:3000 by default.
 
 ## Deployment on Synology NAS
 
@@ -120,7 +120,7 @@ The script will:
 1. Update the `.env` file with your NAS IP address:
 
 ```
-VITE_API_URL=http://your-nas-ip:8070/api
+VITE_API_URL=http://your-nas-ip:3000/api
 ```
 
 2. Build the production version of the frontend:

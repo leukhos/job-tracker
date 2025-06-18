@@ -30,17 +30,17 @@ Upload the entire backend directory to your Synology NAS. You can use File Stati
 4. In the wizard, configure the following:
    - **Container Name**: job-tracker-backend
    - **Advanced Settings**:
-     - **Port Settings**: Map local port 8070 to container port 8070
+     - **Port Settings**: Map local port 3000 to container port 3000
      - **Volume**: Create a new volume or use an existing one, mount it to `/app/data` in container
      - **Environment**:
        - `NODE_ENV=production`
-       - `PORT=8070`
+       - `PORT=3000`
 
 4. Apply and launch the container
 
 ### Step 4: Test Your Deployment
 
-Open a web browser and navigate to `http://your-nas-ip:8070/api/status`
+Open a web browser and navigate to `http://your-nas-ip:3000/api/status`
 
 You should see a JSON response with status information if the server is running correctly.
 
@@ -61,7 +61,7 @@ This will build and start the container based on the `docker-compose.yml` file.
 
 ### Via API
 
-Access `http://your-nas-ip:8070/api/status` in your browser
+Access `http://your-nas-ip:3000/api/status` in your browser
 
 ### Via Docker GUI
 
@@ -99,7 +99,7 @@ To update after code changes:
 
 Update your React app's `.env.production` file with:
 ```
-VITE_API_URL=http://your-nas-ip:8070/api
+VITE_API_URL=http://your-nas-ip:3000/api
 ```
 
 Then rebuild your React app and deploy to Web Station.
@@ -143,19 +143,19 @@ If you prefer absolute version stability, use a specific version tag like `20-al
 
 To verify which Node.js version is running in your container:
 
-1. Go to `http://your-nas-ip:8070/api/status` - this will show the Node.js version
+1. Go to `http://your-nas-ip:3000/api/status` - this will show the Node.js version
 2. Or use Docker to run: `docker exec job-tracker-backend node -v`
 
 ## Port Configuration
 
-### Why Port 8070?
+### Why Port 3000?
 
-This application uses port 8070 instead of more common ports like 3000 or 3001 for several reasons:
+This application uses port 3000 instead of more common ports like 3000 or 3001 for several reasons:
 
 1. **Avoid conflicts**: Popular development frameworks like React, Next.js, and Express commonly use ports 3000-3001, which could cause conflicts
 2. **NAS compatibility**: Some Synology NAS systems use common ports for their own services
 3. **Security by obscurity**: Using a less common port adds a tiny layer of security through obscurity
-4. **Memorable**: 8070 is easy to remember and unlikely to be used by other applications
+4. **Memorable**: 3000 is easy to remember and unlikely to be used by other applications
 
 ### Changing the Port
 

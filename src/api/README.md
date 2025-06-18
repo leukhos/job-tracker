@@ -73,8 +73,8 @@ const handleSubmit = async (e) => {
 
 ## Configuration
 
-By default, the API client connects to `http://localhost:8070/api`. You can change this by setting the `VITE_API_URL` environment variable in your `.env` file:
+By default, the API client connects to `http://localhost:3000/api`. You can change this by setting the `VITE_API_URL` environment variable in your `.env` file:
 
 ```
-VITE_API_URL=http://your-nas-ip:8070/api
+VITE_API_URL=http://your-nas-ip:3000/api
 ```

@@ -19,7 +19,7 @@ COPY . .
 VOLUME /app/data
 
 # Expose port
-EXPOSE 8070
+EXPOSE 3000
 
 # Command to run the app
 CMD ["node", "server.js"]
