@@ -81,27 +81,23 @@ const initializeDatabase = () => {
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
   
-  // Create a transaction for inserting multiple records
-  const insertMany = database.db.transaction((jobs) => {
-    for (const job of jobs) {
-      insertStmt.run(
-        job.jobTitle,
-        job.company,
-        job.location,
-        job.remoteType,
-        job.salaryMin,
-        job.salaryMax,
-        job.status,
-        job.jobUrl,
-        job.notes,
-        job.lastUpdated,
-        job.createdAt,
-        job.updatedAt
-      );
-    }
-  });
-  
-  insertMany(sampleJobs);
+  // Insert jobs without transaction (built-in SQLite doesn't have the same transaction API)
+  for (const job of sampleJobs) {
+    insertStmt.run(
+      job.jobTitle,
+      job.company,
+      job.location,
+      job.remoteType,
+      job.salaryMin,
+      job.salaryMax,
+      job.status,
+      job.jobUrl,
+      job.notes,
+      job.lastUpdated,
+      job.createdAt,
+      job.updatedAt
+    );
+  }
   
   console.log('Sample jobs inserted successfully');
 };
