@@ -223,9 +223,23 @@ const JobTracker = () => {
     if (!dateString) return 'Not specified';
     return new Date(dateString).toLocaleDateString();
   };
+  // Status grouping functions
+  const getJobStatusGroup = (status) => {
+    if (status === 'applied') return 'applied';
+    if (['screening', 'interview', 'followup', 'offer'].includes(status)) return 'active';
+    if (['rejected', 'withdrawn'].includes(status)) return 'archived';
+    return 'applied'; // fallback
+  };
+
+  const isJobArchived = (status) => {
+    return ['rejected', 'withdrawn'].includes(status);
+  };
+
   // Filtering and sorting functions
-  const isJobOld = (lastUpdated) => {
+  const isJobOld = (lastUpdated, status) => {
     if (!lastUpdated) return false;
+    // Don't apply orange border rule to archived jobs
+    if (isJobArchived(status)) return false;
     const twoWeeksAgo = new Date();
     twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
     return new Date(lastUpdated) < twoWeeksAgo;
@@ -245,7 +259,7 @@ const JobTracker = () => {
 
     // Apply status filter
     if (statusFilter !== 'all') {
-      filtered = filtered.filter(job => job.status === statusFilter);
+      filtered = filtered.filter(job => getJobStatusGroup(job.status) === statusFilter);
     }    // Always sort by company name
     filtered.sort((a, b) => {
       const aValue = a.company.toLowerCase();
@@ -373,7 +387,7 @@ const JobTracker = () => {
                 {filteredAndSortedJobs().map((job) => (
                   <div
                     key={job.id}
-                    className={`bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow ${isJobOld(job.lastUpdated) ? 'border-l-4 border-orange-400' : ''}`}
+                    className={`${isJobArchived(job.status) ? 'bg-gray-50' : 'bg-white'} rounded-lg shadow-sm hover:shadow-md transition-shadow ${isJobOld(job.lastUpdated, job.status) ? 'border-l-4 border-orange-400' : ''}`}
                   >
                     <div className="p-4 sm:p-6">
                       {/* First line: job title and company */}
@@ -463,7 +477,7 @@ const JobTracker = () => {
                             <span className="text-gray-400">No job link</span>
                           )}
 
-                          <div className={`flex items-center gap-1 ${isJobOld(job.lastUpdated) ? 'text-orange-600' : 'text-gray-500'}`}>
+                          <div className={`flex items-center gap-1 ${isJobArchived(job.status) ? 'text-gray-400' : isJobOld(job.lastUpdated, job.status) ? 'text-orange-600' : 'text-gray-500'}`}>
                             <Clock className="h-3 w-3 flex-shrink-0" />
                             <span>Updated: {formatDate(job.lastUpdated)}</span>
                           </div>
@@ -477,13 +491,13 @@ const JobTracker = () => {
           )}
         </div>
 
-        {/* Symbol Filters Bottom Bar - Always on top */}
+        {/* Status Group Filters Bottom Bar */}
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
           <div className="max-w-7xl mx-auto flex justify-between items-center">
-            <div className="flex overflow-x-auto hide-scrollbar">
+            <div className="flex w-full">
               <button
                 onClick={() => handleStatClick('total')}
-                className={`h-14 px-4 flex flex-col items-center justify-center transition-colors ${statusFilter === 'all' ? 'bg-blue-50 text-blue-600 border-t-2 border-blue-600' : 'text-gray-600 hover:text-gray-900'}`}
+                className={`flex-1 h-14 flex flex-col items-center justify-center transition-colors ${statusFilter === 'all' ? 'bg-blue-50 text-blue-600 border-t-2 border-blue-600' : 'text-gray-600 hover:text-gray-900'}`}
                 title="All Applications"
               >
                 <Briefcase className="h-5 w-5 mb-1" />
@@ -492,65 +506,29 @@ const JobTracker = () => {
 
               <button
                 onClick={() => handleStatClick('applied')}
-                className={`h-14 px-4 flex flex-col items-center justify-center transition-colors ${statusFilter === 'applied' ? 'bg-blue-50 text-blue-600 border-t-2 border-blue-600' : 'text-gray-600 hover:text-gray-900'}`}
-                title="Applied"
+                className={`flex-1 h-14 flex flex-col items-center justify-center transition-colors ${statusFilter === 'applied' ? 'bg-blue-50 text-blue-600 border-t-2 border-blue-600' : 'text-gray-600 hover:text-gray-900'}`}
+                title="Applied Jobs"
               >
                 <Clock className="h-5 w-5 mb-1" />
                 <span className="text-xs">Applied</span>
               </button>
 
               <button
-                onClick={() => handleStatClick('screening')}
-                className={`h-14 px-4 flex flex-col items-center justify-center transition-colors ${statusFilter === 'screening' ? 'bg-yellow-50 text-yellow-600 border-t-2 border-yellow-600' : 'text-gray-600 hover:text-gray-900'}`}
-                title="Screening"
-              >
-                <Search className="h-5 w-5 mb-1" />
-                <span className="text-xs">Screening</span>
-              </button>
-
-              <button
-                onClick={() => handleStatClick('interview')}
-                className={`h-14 px-4 flex flex-col items-center justify-center transition-colors ${statusFilter === 'interview' ? 'bg-purple-50 text-purple-600 border-t-2 border-purple-600' : 'text-gray-600 hover:text-gray-900'}`}
-                title="Interview"
-              >
-                <Calendar className="h-5 w-5 mb-1" />
-                <span className="text-xs">Interview</span>
-              </button>
-
-              <button
-                onClick={() => handleStatClick('followup')}
-                className={`h-14 px-4 flex flex-col items-center justify-center transition-colors ${statusFilter === 'followup' ? 'bg-orange-50 text-orange-600 border-t-2 border-orange-600' : 'text-gray-600 hover:text-gray-900'}`}
-                title="Follow-up"
+                onClick={() => handleStatClick('active')}
+                className={`flex-1 h-14 flex flex-col items-center justify-center transition-colors ${statusFilter === 'active' ? 'bg-green-50 text-green-600 border-t-2 border-green-600' : 'text-gray-600 hover:text-gray-900'}`}
+                title="Active Applications (Screening to Offer)"
               >
                 <Monitor className="h-5 w-5 mb-1" />
-                <span className="text-xs">Follow-up</span>
+                <span className="text-xs">Active</span>
               </button>
 
               <button
-                onClick={() => handleStatClick('offer')}
-                className={`h-14 px-4 flex flex-col items-center justify-center transition-colors ${statusFilter === 'offer' ? 'bg-green-50 text-green-600 border-t-2 border-green-600' : 'text-gray-600 hover:text-gray-900'}`}
-                title="Offer"
-              >
-                <PoundSterling className="h-5 w-5 mb-1" />
-                <span className="text-xs">Offer</span>
-              </button>
-
-              <button
-                onClick={() => handleStatClick('rejected')}
-                className={`h-14 px-4 flex flex-col items-center justify-center transition-colors ${statusFilter === 'rejected' ? 'bg-red-50 text-red-600 border-t-2 border-red-600' : 'text-gray-600 hover:text-gray-900'}`}
-                title="Rejected"
+                onClick={() => handleStatClick('archived')}
+                className={`flex-1 h-14 flex flex-col items-center justify-center transition-colors ${statusFilter === 'archived' ? 'bg-gray-50 text-gray-600 border-t-2 border-gray-600' : 'text-gray-600 hover:text-gray-900'}`}
+                title="Archived Applications (Rejected/Withdrawn)"
               >
                 <X className="h-5 w-5 mb-1" />
-                <span className="text-xs">Rejected</span>
-              </button>
-
-              <button
-                onClick={() => handleStatClick('withdrawn')}
-                className={`h-14 px-4 flex flex-col items-center justify-center transition-colors ${statusFilter === 'withdrawn' ? 'bg-gray-50 text-gray-600 border-t-2 border-gray-600' : 'text-gray-600 hover:text-gray-900'}`}
-                title="Withdrawn"
-              >
-                <Trash2 className="h-5 w-5 mb-1" />
-                <span className="text-xs">Withdrawn</span>
+                <span className="text-xs">Archived</span>
               </button>
             </div>
           </div>
