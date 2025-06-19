@@ -265,17 +265,7 @@ app.delete('/api/jobs/:id', async (req, res) => {
   }
 });
 
-// Handle production
-// Serve static assets if in production
-if (process.env.NODE_ENV === 'production') {
-  // Set static folder
-  app.use(express.static(path.join(__dirname, '../build')));
-
-  // Any route that's not the API will be directed to the React app
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../build/index.html'));
-  });
-}
+// Production mode - API only (frontend served separately)
 
 // Error handling middleware
 app.use(errorHandler);
