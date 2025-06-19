@@ -17,6 +17,7 @@ import {
   WifiOff,
   AlertCircle
 } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import useJobs from './api/useJobs';
 
 // Status Dropdown Component
@@ -440,7 +441,9 @@ const JobTracker = () => {
                         {/* Notes */}
                         {job.notes && (
                           <div className="mt-2 p-3 bg-gray-50 rounded text-sm text-gray-600">
-                            <div className="line-clamp-3">{job.notes}</div>
+                            <div className="max-h-32 overflow-y-auto prose prose-sm max-w-none prose-gray prose-ul:my-2 prose-li:my-0">
+                              <ReactMarkdown>{job.notes}</ReactMarkdown>
+                            </div>
                           </div>
                         )}
 
