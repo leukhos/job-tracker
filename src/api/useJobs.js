@@ -236,7 +236,7 @@ const useJobs = () => {
   };
   // Update job status (convenience method)
   const updateJobStatus = async (id, newStatus) => {
-    // Find the current job data to preserve required fields
+    // Find the current job data to preserve all fields
     const currentJob = jobs.find(job => job.id === id);
     if (!currentJob) {
       setError(`Job with ID ${id} not found`);
@@ -244,9 +244,15 @@ const useJobs = () => {
     }
     
     return updateJob(id, { 
-      // Include required fields to satisfy server validation
+      // Preserve all existing fields and only update status
       jobTitle: currentJob.jobTitle,
       company: currentJob.company,
+      location: currentJob.location,
+      remoteType: currentJob.remoteType,
+      salaryMin: currentJob.salaryMin,
+      salaryMax: currentJob.salaryMax,
+      jobUrl: currentJob.jobUrl,
+      notes: currentJob.notes,
       status: newStatus,
       lastUpdated: new Date().toISOString().split('T')[0]
     });

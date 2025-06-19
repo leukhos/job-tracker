@@ -43,18 +43,24 @@ const StatusDropdown = ({ status, onStatusChange, statusOptions }) => {
 
   return (
     <div className="relative" ref={dropdownRef}>      <button
+      type="button"
       className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium cursor-pointer ${statusConfig.color}`}
-      onClick={() => setIsOpen(!isOpen)}
+      onClick={(e) => {
+        e.stopPropagation();
+        setIsOpen(!isOpen);
+      }}
     >
       {statusConfig.label}
       <ChevronDown className="h-3 w-3" />
     </button>
       {isOpen && (
-        <div className="absolute right-0 z-10 mt-1 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+        <div className="absolute right-0 z-[60] mt-1 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
           <div className="py-1">
             {statusOptions.map((option) => (              <button
+                type="button"
                 key={option.value}
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation();
                   onStatusChange(option.value);
                   setIsOpen(false);
                 }}
