@@ -1,6 +1,6 @@
 # Job Tracker
 
-> **⚠️ Disclaimer**: This project has been entirely developed using GitHub Copilot (Claude AI) as a coding assistant. The code and documentation have not been reviewed by a developer with experience in Node.js or React. This is a personal use project and there is significant room for improvement in terms of code quality, security practices, and overall architecture. Use at your own discretion and consider having the code reviewed by experienced developers before using in any production environment.
+> **⚠️ Disclaimer**: This project has been entirely developed using GitHub Copilot and Claude Code as coding assistants. The code and documentation have not been reviewed by a developer with experience in Node.js or React. This is a personal use project and there is significant room for improvement in terms of code quality, security practices, and overall architecture. Use at your own discretion and consider having the code reviewed by experienced developers before using in any production environment.
 
 A React application for tracking and managing job applications during your job search process. Now with data persistence through a Node.js/Express backend and SQLite database!
 
@@ -37,8 +37,8 @@ job-tracker/
     ├── api/             # API integration
     │   ├── api.js       # API client
     │   └── useJobs.js   # React hook for job data
-    ├── JobTracker.js    # Main application component
-    └── index.js         # Application entry point
+    ├── JobTracker.jsx   # Main application component
+    └── index.jsx        # Application entry point
 ```
 
 ## Getting Started
@@ -136,7 +136,7 @@ npm run build
 ### Frontend
 
 - `npm start` - Starts the frontend development server
-- `npm build` - Builds the frontend app for production
+- `npm run build` - Builds the frontend app for production
 - `npm test` - Runs frontend tests
 
 ### Backend
