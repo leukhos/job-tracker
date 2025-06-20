@@ -266,14 +266,11 @@ const JobTracker = () => {
     // Apply status filter
     if (statusFilter !== 'all') {
       filtered = filtered.filter(job => getJobStatusGroup(job.status) === statusFilter);
-    }    // Always sort by company name
+    }    // Sort by update date (more recent first)
     filtered.sort((a, b) => {
-      const aValue = a.company.toLowerCase();
-      const bValue = b.company.toLowerCase();
-
-      if (aValue < bValue) return -1; // Always ascending order
-      if (aValue > bValue) return 1;
-      return 0;
+      const aDate = new Date(a.lastUpdated || '1970-01-01');
+      const bDate = new Date(b.lastUpdated || '1970-01-01');
+      return bDate - aDate; // Descending order (newer first)
     });
 
     return filtered;
