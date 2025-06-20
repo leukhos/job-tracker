@@ -106,7 +106,7 @@ const JobTracker = () => {
     status: 'applied',
     jobUrl: '',
     notes: '',
-    lastUpdated: new Date().toISOString().split('T')[0]
+    lastUpdated: Date.now()
   });
   const [errors, setErrors] = useState({});
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
@@ -137,7 +137,7 @@ const JobTracker = () => {
       status: 'applied',
       jobUrl: '',
       notes: '',
-      lastUpdated: new Date().toISOString().split('T')[0]
+      lastUpdated: Date.now()
     });
     setErrors({});
     setEditingJob(null);
@@ -155,7 +155,7 @@ const JobTracker = () => {
         status: job.status,
         jobUrl: job.jobUrl || '',
         notes: job.notes || '',
-        lastUpdated: job.lastUpdated || new Date().toISOString().split('T')[0]
+        lastUpdated: job.lastUpdated || Date.now()
       });
     } else {
       resetForm();
@@ -198,7 +198,7 @@ const JobTracker = () => {
       ...formData,
       salaryMin: formData.salaryMin ? Number(formData.salaryMin) : null,
       salaryMax: formData.salaryMax ? Number(formData.salaryMax) : null,
-      lastUpdated: new Date().toISOString().split('T')[0]
+      lastUpdated: Date.now()
     };
 
     try {
@@ -225,9 +225,11 @@ const JobTracker = () => {
     if (min) return `${formatValue(min)}+`;
     if (max) return `Up to ${formatValue(max)}`;
   };
-  const formatDate = (dateString) => {
-    if (!dateString) return 'Not specified';
-    return new Date(dateString).toLocaleDateString();
+  const formatDate = (timestamp) => {
+    if (!timestamp) return 'Not specified';
+    // Handle both EPOCH timestamps and date strings for backward compatibility
+    const date = typeof timestamp === 'number' ? new Date(timestamp) : new Date(timestamp);
+    return date.toLocaleDateString();
   };
   // Status grouping functions
   const getJobStatusGroup = (status) => {
@@ -246,9 +248,11 @@ const JobTracker = () => {
     if (!lastUpdated) return false;
     // Don't apply orange border rule to archived jobs
     if (isJobArchived(status)) return false;
-    const twoWeeksAgo = new Date();
-    twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
-    return new Date(lastUpdated) < twoWeeksAgo;
+    const twoWeeksAgo = Date.now() - (14 * 24 * 60 * 60 * 1000); // 14 days in milliseconds
+    
+    // Handle both EPOCH timestamps and date strings for backward compatibility
+    const timestamp = typeof lastUpdated === 'number' ? lastUpdated : new Date(lastUpdated).getTime();
+    return timestamp < twoWeeksAgo;
   };
 
   const filteredAndSortedJobs = () => {
@@ -266,11 +270,20 @@ const JobTracker = () => {
     // Apply status filter
     if (statusFilter !== 'all') {
       filtered = filtered.filter(job => getJobStatusGroup(job.status) === statusFilter);
-    }    // Sort by update date (more recent first)
+    }    
+    
+    // Sort by update date (older first)
     filtered.sort((a, b) => {
-      const aDate = new Date(a.lastUpdated || '1970-01-01');
-      const bDate = new Date(b.lastUpdated || '1970-01-01');
-      return bDate - aDate; // Descending order (newer first)
+      // Handle both EPOCH timestamps and date strings for backward compatibility
+      const getTimestamp = (dateValue) => {
+        if (!dateValue) return 0;
+        if (typeof dateValue === 'number') return dateValue;
+        return new Date(dateValue).getTime() || 0;
+      };
+      
+      const aTimestamp = getTimestamp(a.lastUpdated);
+      const bTimestamp = getTimestamp(b.lastUpdated);
+      return aTimestamp - bTimestamp; // Ascending order (older first)
     });
 
     return filtered;

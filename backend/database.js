@@ -54,16 +54,14 @@ const SQL = {
       status TEXT DEFAULT 'applied',
       jobUrl TEXT,
       notes TEXT,
-      lastUpdated TEXT,
-      createdAt TEXT,
-      updatedAt TEXT
+      lastUpdated INTEGER
     )
   `,
   CREATE_VERSION_TABLE: `
     CREATE TABLE IF NOT EXISTS db_version (
       id INTEGER PRIMARY KEY CHECK (id = 1),
       version INTEGER NOT NULL,
-      updated_at TEXT NOT NULL
+      updated_at INTEGER NOT NULL
     )
   `,
   GET_DB_VERSION: 'SELECT version FROM db_version WHERE id = 1',
@@ -76,8 +74,8 @@ const SQL = {
     INSERT INTO jobs (
       jobTitle, company, location, remoteType, 
       salaryMin, salaryMax, status, jobUrl, 
-      notes, lastUpdated, createdAt, updatedAt
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      notes, lastUpdated
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `,
   UPDATE_JOB: `
     UPDATE jobs SET
@@ -90,8 +88,7 @@ const SQL = {
       status = ?,
       jobUrl = ?,
       notes = ?,
-      lastUpdated = ?,
-      updatedAt = ?
+      lastUpdated = ?
     WHERE id = ?
   `,
   DELETE_JOB: 'DELETE FROM jobs WHERE id = ?',
@@ -129,12 +126,12 @@ const initDb = () => {
       } else {
         // Set initial version
         const setVersionStmt = db.prepare(SQL.SET_DB_VERSION);
-        setVersionStmt.run(currentVersion, new Date().toISOString());
+        setVersionStmt.run(currentVersion, Date.now());
       }
     } catch (err) {
       console.log('Setting up version tracking for the first time');
       const setVersionStmt = db.prepare(SQL.SET_DB_VERSION);
-      setVersionStmt.run(currentVersion, new Date().toISOString());
+      setVersionStmt.run(currentVersion, Date.now());
     }
     
     // Create jobs table if it doesn't exist
@@ -142,11 +139,155 @@ const initDb = () => {
     console.log('Jobs table initialized successfully.');
     
     // Perform migrations if needed
-    // if (currentVersion < 2) {
-    //   // Example migration: db.exec('ALTER TABLE jobs ADD COLUMN new_column TEXT');
-    //   // Update version: db.prepare(SQL.SET_DB_VERSION).run(2, new Date().toISOString());
-    //   // currentVersion = 2;
-    // }
+    if (currentVersion < 3) {
+      if (currentVersion < 2) {
+        console.log('Migrating database to version 2: Converting date fields to EPOCH timestamps...');
+        
+        // Check if we need to migrate by looking for TEXT date fields
+        const checkColumnsStmt = db.prepare("PRAGMA table_info(jobs)");
+        const columns = checkColumnsStmt.all();
+        const lastUpdatedColumn = columns.find(col => col.name === 'lastUpdated');
+        
+        if (lastUpdatedColumn && lastUpdatedColumn.type === 'TEXT') {
+          // Migration needed - convert TEXT dates to EPOCH timestamps
+          
+          // First, get all existing jobs
+          const getAllJobsStmt = db.prepare('SELECT * FROM jobs');
+          const existingJobs = getAllJobsStmt.all();
+          
+          if (existingJobs.length > 0) {
+            // Create new table with INTEGER date fields but still with createdAt/updatedAt
+            db.exec(`
+              CREATE TABLE jobs_v2 (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                jobTitle TEXT NOT NULL,
+                company TEXT NOT NULL,
+                location TEXT,
+                remoteType TEXT DEFAULT 'on-site',
+                salaryMin INTEGER,
+                salaryMax INTEGER,
+                status TEXT DEFAULT 'applied',
+                jobUrl TEXT,
+                notes TEXT,
+                lastUpdated INTEGER,
+                createdAt INTEGER,
+                updatedAt INTEGER
+              )
+            `);
+            
+            // Convert and insert data
+            const insertStmt = db.prepare(`
+              INSERT INTO jobs_v2 (
+                id, jobTitle, company, location, remoteType, 
+                salaryMin, salaryMax, status, jobUrl, notes, 
+                lastUpdated, createdAt, updatedAt
+              ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            `);
+            
+            for (const job of existingJobs) {
+              const convertToEpoch = (dateStr) => {
+                if (!dateStr) return Date.now();
+                // Handle both ISO strings and date-only strings
+                const date = new Date(dateStr);
+                return isNaN(date.getTime()) ? Date.now() : date.getTime();
+              };
+              
+              insertStmt.run(
+                job.id,
+                job.jobTitle,
+                job.company,
+                job.location,
+                job.remoteType,
+                job.salaryMin,
+                job.salaryMax,
+                job.status,
+                job.jobUrl,
+                job.notes,
+                convertToEpoch(job.lastUpdated),
+                convertToEpoch(job.createdAt),
+                convertToEpoch(job.updatedAt)
+              );
+            }
+            
+            // Drop old table and rename new one
+            db.exec('DROP TABLE jobs');
+            db.exec('ALTER TABLE jobs_v2 RENAME TO jobs');
+            
+            console.log(`Migrated ${existingJobs.length} jobs to EPOCH timestamps`);
+          }
+        }
+        
+        // Update version to 2
+        const setVersionStmt = db.prepare(SQL.SET_DB_VERSION);
+        setVersionStmt.run(2, Date.now());
+        currentVersion = 2;
+        console.log('Migration to version 2 completed');
+      }
+      
+      if (currentVersion < 3) {
+        console.log('Migrating database to version 3: Removing unused createdAt and updatedAt columns...');
+        
+        // Get all existing jobs
+        const getAllJobsStmt = db.prepare('SELECT * FROM jobs');
+        const existingJobs = getAllJobsStmt.all();
+        
+        if (existingJobs.length > 0) {
+          // Create new table without createdAt/updatedAt
+          db.exec(`
+            CREATE TABLE jobs_v3 (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              jobTitle TEXT NOT NULL,
+              company TEXT NOT NULL,
+              location TEXT,
+              remoteType TEXT DEFAULT 'on-site',
+              salaryMin INTEGER,
+              salaryMax INTEGER,
+              status TEXT DEFAULT 'applied',
+              jobUrl TEXT,
+              notes TEXT,
+              lastUpdated INTEGER
+            )
+          `);
+          
+          // Copy data without createdAt/updatedAt
+          const insertStmt = db.prepare(`
+            INSERT INTO jobs_v3 (
+              id, jobTitle, company, location, remoteType, 
+              salaryMin, salaryMax, status, jobUrl, notes, 
+              lastUpdated
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          `);
+          
+          for (const job of existingJobs) {
+            insertStmt.run(
+              job.id,
+              job.jobTitle,
+              job.company,
+              job.location,
+              job.remoteType,
+              job.salaryMin,
+              job.salaryMax,
+              job.status,
+              job.jobUrl,
+              job.notes,
+              job.lastUpdated
+            );
+          }
+          
+          // Drop old table and rename new one
+          db.exec('DROP TABLE jobs');
+          db.exec('ALTER TABLE jobs_v3 RENAME TO jobs');
+          
+          console.log(`Simplified schema for ${existingJobs.length} jobs (removed createdAt/updatedAt)`);
+        }
+        
+        // Update version to 3
+        const setVersionStmt = db.prepare(SQL.SET_DB_VERSION);
+        setVersionStmt.run(3, Date.now());
+        currentVersion = 3;
+        console.log('Migration to version 3 completed');
+      }
+    }
     
     console.log(`Database is at version ${currentVersion}`);
   } catch (error) {
@@ -205,7 +346,7 @@ const createJob = (jobData) => {
       throw new Error('Job title and company are required fields');
     }
     
-    const now = new Date().toISOString();
+    const now = Date.now();
     
     const {
       jobTitle,
@@ -220,6 +361,13 @@ const createJob = (jobData) => {
       lastUpdated
     } = jobData;
 
+    // Convert lastUpdated to EPOCH if it's a string
+    let lastUpdatedEpoch = lastUpdated;
+    if (typeof lastUpdated === 'string') {
+      const date = new Date(lastUpdated);
+      lastUpdatedEpoch = isNaN(date.getTime()) ? now : date.getTime();
+    }
+
     const stmt = db.prepare(SQL.CREATE_JOB);
     
     const info = stmt.run(
@@ -232,9 +380,7 @@ const createJob = (jobData) => {
       status || 'applied',
       jobUrl || null,
       notes || null,
-      lastUpdated || now,
-      now,
-      now
+      lastUpdatedEpoch || now
     );
 
     return getJobById(info.lastInsertRowid);
@@ -248,7 +394,7 @@ const createJob = (jobData) => {
 const updateJob = (id, jobData) => {
   if (!db) initDb();
   try {
-    const now = new Date().toISOString();
+    const now = Date.now();
     
     // Check if job exists
     const job = getJobById(id);
@@ -269,6 +415,13 @@ const updateJob = (id, jobData) => {
       lastUpdated
     } = jobData;
 
+    // Convert lastUpdated to EPOCH if it's a string
+    let lastUpdatedEpoch = lastUpdated;
+    if (typeof lastUpdated === 'string') {
+      const date = new Date(lastUpdated);
+      lastUpdatedEpoch = isNaN(date.getTime()) ? now : date.getTime();
+    }
+
     const stmt = db.prepare(SQL.UPDATE_JOB);
     
     stmt.run(
@@ -281,8 +434,7 @@ const updateJob = (id, jobData) => {
       status || 'applied',
       jobUrl || null,
       notes || null,
-      lastUpdated || now,
-      now,
+      lastUpdatedEpoch || now,
       id
     );
 

@@ -80,8 +80,7 @@ describe('Database Operations', () => {
       const createdJob = createJob(newJob);
       expect(createdJob.id).toBeTruthy();
       expect(createdJob.jobTitle).toBe('QA Engineer');
-      expect(createdJob.createdAt).toBeTruthy();
-      expect(createdJob.updatedAt).toBeTruthy();
+      expect(createdJob.lastUpdated).toBeTruthy();
 
       // Verify the job was actually saved
       const retrievedJob = getJobById(createdJob.id);
@@ -90,17 +89,15 @@ describe('Database Operations', () => {
     });
 
     it('should use provided timestamps if available', () => {
-      const customDate = '2025-01-01T00:00:00.000Z';
+      const customTimestamp = Date.now() - 86400000; // 1 day ago
       const newJob = {
         jobTitle: 'Product Manager',
         company: 'PM Co',
-        createdAt: customDate,
-        updatedAt: customDate
+        lastUpdated: customTimestamp
       };
 
       const createdJob = createJob(newJob);
-      expect(createdJob.createdAt).toBe(customDate);
-      expect(createdJob.updatedAt).toBe(customDate);
+      expect(createdJob.lastUpdated).toBe(customTimestamp);
     });
   });
   describe('updateJob', () => {
