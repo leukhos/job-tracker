@@ -160,3 +160,44 @@ Job Tracker helps you stay organized during your job search by providing a centr
 - `POST /api/jobs` - Create a new job application
 - `PUT /api/jobs/:id` - Update an existing job application
 - `DELETE /api/jobs/:id` - Delete a job application
+
+## Continuous Integration
+
+This project uses GitHub Actions for automated testing and CI/CD. The workflows automatically run when pull requests are created against the `main` branch.
+
+### GitHub Actions Workflows
+
+#### Backend Tests (`backend-tests.yml`)
+- Runs backend tests on Node.js LTS
+- Initializes test database
+- Generates code coverage reports
+- Only triggers when backend files are modified
+
+#### Full CI/CD Pipeline (`ci-cd.yml`)
+- Comprehensive testing for both frontend and backend
+- Integration tests included
+
+### Running Tests Locally
+
+Before pushing changes, run tests locally:
+
+```bash
+# Backend tests
+cd backend
+npm install
+npm run init-db
+npm test
+npm run test:coverage
+
+# Frontend tests (if applicable)
+npm install
+npm test
+npm run build
+```
+
+### Monitoring CI/CD
+
+View workflow runs in the **Actions** tab of the GitHub repository to monitor:
+- Test results
+- Code coverage reports
+- Build status and any failures
