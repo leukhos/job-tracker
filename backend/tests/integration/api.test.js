@@ -126,8 +126,7 @@ describe('API Endpoints', () => {
       expect(res.body).toHaveProperty('id');
       expect(res.body).toHaveProperty('jobTitle', newJob.jobTitle);
       expect(res.body).toHaveProperty('company', newJob.company);
-      expect(res.body).toHaveProperty('createdAt');
-      expect(res.body).toHaveProperty('updatedAt');
+      expect(res.body).toHaveProperty('lastUpdated');
     });
 
     it('should return 400 for invalid input', async () => {

@@ -104,7 +104,7 @@ const useJobs = () => {
     const newJob = { 
       ...jobData,
       id: tempId,
-      lastUpdated: new Date().toISOString().split('T')[0] 
+      lastUpdated: Date.now()
     };
     
     // Optimistic update
@@ -156,7 +156,7 @@ const useJobs = () => {
     const updatedJob = { 
       ...originalJob, 
       ...jobData,
-      lastUpdated: new Date().toISOString().split('T')[0] 
+      lastUpdated: Date.now()
     };
     
     // Optimistic update
@@ -254,7 +254,7 @@ const useJobs = () => {
       jobUrl: currentJob.jobUrl,
       notes: currentJob.notes,
       status: newStatus,
-      lastUpdated: new Date().toISOString().split('T')[0]
+      lastUpdated: Date.now()
     });
   };
 

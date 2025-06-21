@@ -20,9 +20,7 @@ const initTestDb = () => {
       status TEXT DEFAULT 'applied',
       jobUrl TEXT,
       notes TEXT,
-      lastUpdated TEXT,
-      createdAt TEXT,
-      updatedAt TEXT
+      lastUpdated INTEGER
     )
   `);
 
@@ -31,14 +29,14 @@ const initTestDb = () => {
     CREATE TABLE IF NOT EXISTS db_version (
       id INTEGER PRIMARY KEY CHECK (id = 1),
       version INTEGER NOT NULL,
-      updated TEXT NOT NULL
+      updated_at INTEGER NOT NULL
     )
   `);
   
   // Insert version record
   db.exec(`
-    INSERT OR IGNORE INTO db_version (id, version, updated)
-    VALUES (1, 1, '${new Date().toISOString()}')
+    INSERT OR IGNORE INTO db_version (id, version, updated_at)
+    VALUES (1, 3, ${Date.now()})
   `);
 };
 
@@ -59,6 +57,7 @@ const clearTestDb = () => {
 
 // Seed test data
 const seedTestData = () => {
+  const now = Date.now();
   const sampleJobs = [
     {
       jobTitle: 'Software Engineer',
@@ -70,8 +69,7 @@ const seedTestData = () => {
       status: 'applied',
       jobUrl: 'https://example.com/job1',
       notes: 'Applied through website',
-      createdAt: '2025-06-01T10:00:00.000Z',
-      updatedAt: '2025-06-01T10:00:00.000Z'
+      lastUpdated: now - (5 * 24 * 60 * 60 * 1000) // 5 days ago
     },
     {
       jobTitle: 'Senior Developer',
@@ -83,8 +81,7 @@ const seedTestData = () => {
       status: 'interviewing',
       jobUrl: 'https://example.com/job2',
       notes: 'Phone screen scheduled',
-      createdAt: '2025-06-05T14:30:00.000Z',
-      updatedAt: '2025-06-10T09:15:00.000Z'
+      lastUpdated: now - (2 * 24 * 60 * 60 * 1000) // 2 days ago
     },
     {
       jobTitle: 'Frontend Developer',
@@ -96,18 +93,17 @@ const seedTestData = () => {
       status: 'rejected',
       jobUrl: 'https://example.com/job3',
       notes: 'Rejected after interview',
-      createdAt: '2025-05-20T11:45:00.000Z',
-      updatedAt: '2025-06-15T16:20:00.000Z'
+      lastUpdated: now - (10 * 24 * 60 * 60 * 1000) // 10 days ago
     }
   ];
 
   const stmt = db.prepare(`
     INSERT INTO jobs (
       jobTitle, company, location, remoteType, salaryMin, salaryMax,
-      status, jobUrl, notes, createdAt, updatedAt
+      status, jobUrl, notes, lastUpdated
     ) VALUES (
       @jobTitle, @company, @location, @remoteType, @salaryMin, @salaryMax,
-      @status, @jobUrl, @notes, @createdAt, @updatedAt
+      @status, @jobUrl, @notes, @lastUpdated
     )
   `);
 
@@ -152,7 +148,7 @@ module.exports = {
     return db.prepare('SELECT * FROM jobs WHERE id = ?').get(id);
   },
     createJob: (jobData) => {
-    const now = new Date().toISOString();
+    const now = Date.now();
     const data = {
       jobTitle: jobData.jobTitle || '',
       company: jobData.company || '',
@@ -163,17 +159,16 @@ module.exports = {
       status: jobData.status || 'applied',
       jobUrl: jobData.jobUrl || '',
       notes: jobData.notes || '',
-      createdAt: jobData.createdAt || now,
-      updatedAt: jobData.updatedAt || now
+      lastUpdated: jobData.lastUpdated || now
     };
     
     const stmt = db.prepare(`
       INSERT INTO jobs (
         jobTitle, company, location, remoteType, salaryMin, salaryMax,
-        status, jobUrl, notes, createdAt, updatedAt
+        status, jobUrl, notes, lastUpdated
       ) VALUES (
         @jobTitle, @company, @location, @remoteType, @salaryMin, @salaryMax,
-        @status, @jobUrl, @notes, @createdAt, @updatedAt
+        @status, @jobUrl, @notes, @lastUpdated
       )
     `);
     
@@ -188,7 +183,7 @@ module.exports = {
       return false; // Job not found, return false
     }
     
-    jobData.updatedAt = new Date().toISOString();
+    jobData.lastUpdated = jobData.lastUpdated || Date.now();
     
     const keys = Object.keys(jobData)
       .filter(key => key !== 'id')
