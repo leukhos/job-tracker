@@ -272,7 +272,7 @@ const JobTracker = () => {
       filtered = filtered.filter(job => getJobStatusGroup(job.status) === statusFilter);
     }    
     
-    // Sort by update date (older first)
+    // Sort by update date (newer first)
     filtered.sort((a, b) => {
       // Handle both EPOCH timestamps and date strings for backward compatibility
       const getTimestamp = (dateValue) => {
@@ -283,7 +283,7 @@ const JobTracker = () => {
       
       const aTimestamp = getTimestamp(a.lastUpdated);
       const bTimestamp = getTimestamp(b.lastUpdated);
-      return aTimestamp - bTimestamp; // Ascending order (older first)
+      return bTimestamp - aTimestamp; // Descending order (newer first)
     });
 
     return filtered;
